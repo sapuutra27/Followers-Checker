@@ -209,7 +209,7 @@
     <div id="tutorialBox">
       <video id="tutorialVideo" src="https://github.com/sapuutra27/Followers-Checker/releases/download/Tutorial/tutorial.mp4"></video>
       <div id="controlsRow">
-        <button id="pauseVid">PAUSE</button>
+        <button id="pauseVid">❚❚</button>
         <button id="closeTutorial">Kembali</button>
       </div>
     </div>
@@ -271,10 +271,10 @@ tutorialBtn.onclick = () => {
 pauseBtn.onclick = () => {
   if (video.paused) {
     video.play();
-    pauseBtn.innerText = 'PAUSE';
+    pauseBtn.innerText = '❚❚';
   } else {
     video.pause();
-    pauseBtn.innerText = 'PLAY';
+    pauseBtn.innerText = '▶';
   }
 };
 
