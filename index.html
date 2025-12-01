@@ -219,10 +219,16 @@
   // music
 const music = document.getElementById('bgMusic');
 const toggle = document.getElementById('musicToggle');
-let playing = false;        // status musik
-let autoPaused = false;     // apakah musik dipause otomatis oleh tutorial
+let playing = false;
+let autoPaused = false;
 
-toggle.onclick = () => {    // play/pause manual
+// unlock audio
+music.volume = 1;
+
+toggle.onclick = () => {
+  // unlock audio context
+  music.play().catch(()=>{});
+
   if (!playing) {
     music.play();
     toggle.innerText = 'PAUSE MUSIC';
