@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instagram Followers Checker</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+  <style>
+    /* // font */
+    @font-face { font-family:'BebasNeue'; src:url('./BebasNeue-Regular.ttf') format('truetype'); }
+    @font-face { font-family:'Sequel100Black'; src:url('./Sequel100Black-76.ttf') format('truetype'); }
+
+    :root { --accent:#2563eb; }
+
+    /* // layout dasar */
+    html, body { height:100%; }
+    body {
+      margin:0; background:#000; color:#fff;
+      font-family:Arial, sans-serif;
+      display:flex; justify-content:center; align-items:center;
+      overflow-x:hidden; text-align:center;
+    }
+
+    #bgImage {
+      position:fixed; inset:0;
+      width:100vw; height:100vh;
+      background:url('background.png') center/cover no-repeat;
+      z-index:-1;
+    }
+
+    .container {
+      width:100%; max-width:100%;
+      padding:20px;
+      display:flex; flex-direction:column;
+      align-items:center;
+      overflow:hidden;
+    }
+
+    /* // menu */
+    .menu-wrapper { transform:translateY(-40px); }
+
+    h1 {
+      font-size:27px; margin-bottom:-15px;
+      font-family:'Sequel100Black';
+      text-shadow:2px 2px 6px rgba(0,0,0,.9);
+    }
+
+    .subtitle {
+      margin:24px 0 15px;
+      font-size:14px; font-weight:700;
+      text-shadow:2px 2px 5px rgba(0,0,0,.8);
+    }
+
+    input[type="file"] {
+      padding:10px; border-radius:8px;
+      background:rgba(255,255,255,0.06);
+      border:none; color:#fff;
+    }
+
+    /* // tombol */
+    button {
+      margin-top:15px; padding:10px 22px;
+      border-radius:8px; border:none;
+      background:var(--accent); color:#fff;
+      cursor:pointer; font-weight:700;
+      transition:.15s; box-shadow:0 4px 10px rgba(0,0,0,.4);
+    }
+
+    button:hover { transform:scale(1.03); }
+    button:active { transform:scale(.98); }
+
+    #warnMsg {
+      display:none;
+      margin-top:8px;
+      font-size:13px; font-weight:700;
+    }
+
+    /* // hasil */
+    #resultBox {
+      display:none; opacity:0;
+      background:rgba(0,0,0,.72);
+      padding:18px; border-radius:12px;
+      width:90vw; max-width:600px;
+      max-height:60vh; overflow-y:auto;
+      margin-top:20px; text-align:left;
+      transition:opacity .25s;
+    }
+
+    #resultBox.show { display:block; opacity:1; }
+
+    #backBtn {
+      display:none; margin-top:15px;
+    }
+
+    /* // watermark */
+    @keyframes highlightMove {
+      0% { background-position:250% 0; }
+      100% { background-position:-250% 0; }
+    }
+
+    #watermarkMenu, #watermarkResult {
+      position:fixed; left:50%; transform:translateX(-50%);
+      font-family:'BebasNeue'; font-size:14px;
+      letter-spacing:1.5px; z-index:5;
+      background:linear-gradient(
+        120deg,
+        transparent 0%, transparent 30%,
+        rgba(255,255,255,.9) 50%,
+        transparent 70%, transparent 100%
+      );
+      background-size:250% 100%;
+      -webkit-background-clip:text; color:transparent;
+      animation:highlightMove 5s linear infinite;
+    }
+
+    #watermarkMenu { bottom:250px; }
+    #watermarkResult { bottom:50px; }
+
+    .hidden { display:none !important; }
+
+    /* // music */
+    #musicToggle {
+      position:fixed; bottom:20px; right:20px;
+      font-size:11px; font-weight:bold;
+      color:#fff; opacity:.6;
+      cursor:pointer; transition:.2s;
+    }
+    #musicToggle:hover { opacity:1; }
+
+    /* // tutorial */
+    #tutorialBtn {
+      position:fixed; bottom:55px; right:20px;
+      font-size:11px; font-weight:bold;
+      color:#fff; opacity:.6;
+      cursor:pointer; transition:.2s;
+    }
+    #tutorialBtn:hover { opacity:1; }
+
+    #tutorialOverlay {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.85);
+      display:none; justify-content:center; align-items:center;
+      z-index:9999; opacity:0; transition:.4s;
+    }
+
+    #tutorialOverlay.show { display:flex; opacity:1; }
+
+    #tutorialBox {
+      background:rgba(0,0,0,.6);
+      padding:15px; border-radius:14px;
+      width:70%; max-width:420px; text-align:center;
+    }
+
+    video { width:100%; border-radius:10px; }
+
+    #controlsRow {
+      margin-top:12px;
+      display:flex; gap:8px; justify-content:space-between;
+    }
+
+    #pauseVid, #closeTutorial {
+      width:48%; padding:10px;
+      background:#2563eb; border:none;
+      border-radius:8px; color:#fff;
+      font-weight:700; cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- // audio -->
+  <audio id="bgm" src="music.mp3" autoplay loop></audio>
+  <div id="bgImage"></div>
+
+  <!-- // menu -->
+  <div class="container">
+    <div id="mainMenu" class="menu-wrapper">
+      <h1>Followers Checker</h1>
+      <div class="subtitle">Upload file ZIP Instagram</div>
+
+      <input id="zipInput" type="file" accept=".zip" />
+
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+        <button onclick="startCheck()">Mulai</button>
+        <button style="background:#444" onclick="clearInput()">Clear</button>
+      </div>
+
+      <div id="warnMsg">Silakan upload file ZIP terlebih dahulu.</div>
+    </div>
+
+    <div id="resultBox"></div>
+    <button id="backBtn" onclick="backToMenu()">Kembali</button>
+  </div>
+
+  <!-- // watermark -->
+  <div id="watermarkMenu">- twentyseven -</div>
+  <div id="watermarkResult" class="hidden">- twentyseven -</div>
+
+  <!-- // music toggle -->
+  <div id="musicToggle">PLAY MUSIC</div>
+  <audio id="bgMusic" src="music.mp3" loop></audio>
+
+  <!-- // tutorial -->
+  <div id="tutorialBtn">TUTORIAL</div>
+
+  <div id="tutorialOverlay">
+    <div id="tutorialBox">
+      <video id="tutorialVideo" src="https://github.com/sapuutra27/Followers-Checker/releases/download/Tutorial/tutorial.mp4"></video>
+      <div id="controlsRow">
+        <button id="pauseVid">PAUSE</button>
+        <button id="closeTutorial">Kembali</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // music
+const music = document.getElementById('bgMusic');
+const toggle = document.getElementById('musicToggle');
+let playing = false;        // status musik
+let autoPaused = false;     // apakah musik dipause otomatis oleh tutorial
+
+toggle.onclick = () => {    // play/pause manual
+  if (!playing) {
+    music.play();
+    toggle.innerText = 'PAUSE MUSIC';
+  } else {
+    music.pause();
+    toggle.innerText = 'PLAY MUSIC';
+  }
+  playing = !playing;
+};
+
+  // tutorial
+const tutorialBtn = document.getElementById('tutorialBtn');
+const overlay = document.getElementById('tutorialOverlay');
+const video = document.getElementById('tutorialVideo');
+// auto repeat video
+video.addEventListener('ended', () => {
+  video.currentTime = 0;
+  video.play();
+});
+const pauseBtn = document.getElementById('pauseVid');
+const closeBtn = document.getElementById('closeTutorial');
+
+// buka tutorial
+tutorialBtn.onclick = () => {
+
+  // // auto mute music
+  if (playing) {
+    music.pause();
+    autoPaused = true;      // catat bahwa pause berasal dari tutorial
+    toggle.innerText = 'PLAY MUSIC';
+    playing = false;
+  }
+
+  overlay.classList.add('show');
+  video.currentTime = 0;
+  video.play();
+};
+
+// pause/play video
+pauseBtn.onclick = () => {
+  if (video.paused) {
+    video.play();
+    pauseBtn.innerText = 'PAUSE';
+  } else {
+    video.pause();
+    pauseBtn.innerText = 'PLAY';
+  }
+};
+
+// tutup tutorial
+closeBtn.onclick = () => {
+  video.pause();
+  overlay.classList.remove('show');
+
+  // // auto unmute jika tadi dipause otomatis
+  if (autoPaused) {
+    music.play();
+    toggle.innerText = 'PAUSE MUSIC';
+    playing = true;
+    autoPaused = false;
+  }
+};
+
+  // clear
+  function clearInput() {
+    const zip = document.getElementById('zipInput');
+
+    zip.value = '';
+    document.getElementById('warnMsg').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('resultBox').innerHTML = '';
+    document.getElementById('backBtn').style.display = 'none';
+
+    document.getElementById('mainMenu').style.display = 'block';
+    document.getElementById('watermarkMenu').classList.remove('hidden');
+    document.getElementById('watermarkResult').classList.add('hidden');
+  }
+
+  // cari file
+  function findFile(zip, filename) {
+    const re = new RegExp('(?:^|/)' + filename.replace(/\./g, '\\.') + '$', 'i');
+    return Object.values(zip.files).find(f => re.test(f.name)) || null;
+  }
+
+  function findFollowersFiles(zip) {
+    const re = /(?:^|\/)followers(?:_\d+)?\.json$/i;
+    return Object.values(zip.files).filter(f => re.test(f.name));
+  }
+
+  // proses utama
+  async function startCheck() {
+    const file = document.getElementById('zipInput').files[0];
+    const menu = document.getElementById('mainMenu');
+    const result = document.getElementById('resultBox');
+    const backBtn = document.getElementById('backBtn');
+
+    result.style.display = 'block';
+    result.classList.add('show');
+    backBtn.style.display = 'inline-block';
+    menu.style.display = 'none';
+
+    document.getElementById('watermarkMenu').classList.add('hidden');
+    document.getElementById('watermarkResult').classList.remove('hidden');
+
+    if (!file) {
+      result.innerHTML = 'Silakan upload file ZIP terlebih dahulu.';
+      return;
+    }
+
+    result.innerHTML = 'Memproses...';
+
+    try {
+      const zip = await JSZip.loadAsync(file);
+
+      const followingFile = findFile(zip, 'following.json');
+      const followersFiles = findFollowersFiles(zip);
+
+      if (!followingFile || followersFiles.length === 0) {
+        result.innerHTML =
+          "File ZIP tidak valid.<br>Pastikan memuat <b>following.json</b> & <b>followers_*.json</b>.";
+        return;
+      }
+
+      // followers
+      const followersSet = new Set();
+
+      for (const f of followersFiles) {
+        let json;
+        try { json = JSON.parse(await f.async('string')); } catch { continue; }
+
+        if (Array.isArray(json)) {
+          json.forEach(entry => {
+            const val = entry?.string_list_data?.[0]?.value || entry?.username;
+            if (val) followersSet.add(val);
+          });
+        }
+      }
+
+      // following
+      const followingJson = JSON.parse(await followingFile.async('string'));
+      const followingList = (followingJson.relationships_following || [])
+        .map(e => e.title || e.username)
+        .filter(Boolean);
+
+      // compare
+      const notFollowBack = followingList.filter(u => !followersSet.has(u));
+
+      result.innerHTML =
+        `<b>Total tidak follow balik: ${notFollowBack.length}</b><br><br>` +
+        (notFollowBack.length ? notFollowBack.join('<br>') : 'Semua follow balik.');
+
+    } catch (err) {
+      result.innerHTML = 'Error membaca ZIP: ' + err.message;
+    }
+  }
+
+  // kembali
+  function backToMenu() {
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('resultBox').innerHTML = '';
+    document.getElementById('backBtn').style.display = 'none';
+    document.getElementById('mainMenu').style.display = 'block';
+
+    document.getElementById('watermarkMenu').classList.remove('hidden');
+    document.getElementById('watermarkResult').classList.add('hidden');
+  }
+</script>
+
+</body>
+</html>
