@@ -166,6 +166,38 @@
       border-radius:8px; color:#fff;
       font-weight:700; cursor:pointer;
     }
+    
+    /* overlay loading video */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  transition: 0.3s;
+}
+
+/* animasi loading */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+    }
+    
+    .error-msg {
+      color: #ff4d4d;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -206,6 +238,9 @@
   <div id="tutorialBtn">TUTORIAL</div>
 
   <div id="tutorialOverlay">
+  	<div id="loadingOverlay">
+  <div class="loader"></div>
+</div>
     <div id="tutorialBox">
       <video id="tutorialVideo" src="https://github.com/sapuutra27/Followers-Checker/releases/download/Tutorial/Tutorial.mp4"></video>
       <div id="controlsRow">
@@ -277,6 +312,32 @@ pauseBtn.onclick = () => {
     pauseBtn.innerText = '▶';
   }
 };
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+
+// ketika video buffering karena jaringan lemot
+video.addEventListener('waiting', () => {
+  loadingOverlay.style.display = 'flex';
+  console.log('Buffering...');
+});
+
+// jaringan putus / video tidak bisa load
+video.addEventListener('stalled', () => {
+  loadingOverlay.style.display = 'flex';
+  console.log('Stalled – kemungkinan internet lemot.');
+});
+
+// ketika video mulai berjalan lagi
+video.addEventListener('playing', () => {
+  loadingOverlay.style.display = 'none';
+  console.log('Playing – buffer selesai.');
+});
+
+// kalau video error
+video.addEventListener('error', () => {
+  loadingOverlay.style.display = 'flex';
+  console.log('Error – video gagal dimuat.');
+});
 
 // tutup tutorial
 closeBtn.onclick = () => {
@@ -381,9 +442,9 @@ closeBtn.onclick = () => {
         (notFollowBack.length ? notFollowBack.join('<br>') : 'Semua follow balik.');
 
     } catch (err) {
-      result.innerHTML = 'Error membaca ZIP: ' + err.message;
-    }
-  }
+  result.innerHTML = '<div class="error-msg">Arsip rusak atau file ZIP tidak dapat dibaca.</div>';
+      }
+     }
 
   // kembali
   function backToMenu() {
