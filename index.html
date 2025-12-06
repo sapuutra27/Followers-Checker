@@ -2,198 +2,291 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Instagram Followers Checker</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 
   <style>
-    /* // font */
-    @font-face { font-family:'BebasNeue'; src:url('./BebasNeue-Regular.ttf') format('truetype'); }
-    @font-face { font-family:'Sequel100Black'; src:url('./Sequel100Black-76.ttf') format('truetype'); }
+    /* font */
+    @font-face {
+      font-family: 'BebasNeue';
+      src: url('./BebasNeue-Regular.ttf') format('truetype');
+    }
 
-    :root { --accent:#2563eb; }
+    @font-face {
+      font-family: 'Sequel100Black';
+      src: url('./Sequel100Black-76.ttf') format('truetype');
+    }
 
-    /* // layout dasar */
-    html, body { height:100%; }
+    :root {
+      --accent: #2563eb;
+    }
+
+    /* layout dasar */
+    html, body {
+      height: 100%;
+    }
+
     body {
-      margin:0; background:#000; color:#fff;
-      font-family:Arial, sans-serif;
-      display:flex; justify-content:center; align-items:center;
-      overflow-x:hidden; text-align:center;
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      text-align: center;
     }
 
     #bgImage {
-      position:fixed; inset:0;
-      width:100vw; height:100vh;
-      background:url('background.png') center/cover no-repeat;
-      z-index:-1;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('background.png') center/cover no-repeat;
+      z-index: -1;
     }
 
     .container {
-      width:100%; max-width:100%;
-      padding:20px;
-      display:flex; flex-direction:column;
-      align-items:center;
-      overflow:hidden;
+      width: 100%;
+      max-width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
     }
 
-    /* // menu */
-    .menu-wrapper { transform:translateY(-40px); }
+    /* menu */
+    .menu-wrapper {
+      transform: translateY(-40px);
+    }
 
     h1 {
-      font-size:27px; margin-bottom:-15px;
-      font-family:'Sequel100Black';
-      text-shadow:2px 2px 6px rgba(0,0,0,.9);
+      font-size: 27px;
+      margin-bottom: -15px;
+      font-family: 'Sequel100Black';
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, .9);
     }
 
     .subtitle {
-      margin:24px 0 15px;
-      font-size:14px; font-weight:700;
-      text-shadow:2px 2px 5px rgba(0,0,0,.8);
+      margin: 24px 0 15px;
+      font-size: 14px;
+      font-weight: 700;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, .8);
     }
 
     input[type="file"] {
-      padding:10px; border-radius:8px;
-      background:rgba(255,255,255,0.06);
-      border:none; color:#fff;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: #fff;
     }
 
-    /* // tombol */
+    /* tombol */
     button {
-      margin-top:15px; padding:10px 22px;
-      border-radius:8px; border:none;
-      background:var(--accent); color:#fff;
-      cursor:pointer; font-weight:700;
-      transition:.15s; box-shadow:0 4px 10px rgba(0,0,0,.4);
+      margin-top: 15px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      transition: .15s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
     }
 
-    button:hover { transform:scale(1.03); }
-    button:active { transform:scale(.98); }
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
 
     #warnMsg {
-      display:none;
-      margin-top:8px;
-      font-size:13px; font-weight:700;
+      display: none;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
     }
 
-    /* // hasil */
+    /* hasil */
     #resultBox {
-      display:none; opacity:0;
-      background:rgba(0,0,0,.72);
-      padding:18px; border-radius:12px;
-      width:90vw; max-width:600px;
-      max-height:60vh; overflow-y:auto;
-      margin-top:20px; text-align:left;
-      transition:opacity .25s;
+      display: none;
+      opacity: 0;
+      background: rgba(0, 0, 0, .72);
+      padding: 18px;
+      border-radius: 12px;
+      width: 90vw;
+      max-width: 600px;
+      max-height: 60vh;
+      overflow-y: auto;
+      margin-top: 20px;
+      text-align: left;
+      transition: opacity .25s;
     }
 
-    #resultBox.show { display:block; opacity:1; }
+    #resultBox.show {
+      display: block;
+      opacity: 1;
+    }
 
     #backBtn {
-      display:none; margin-top:15px;
+      display: none;
+      margin-top: 15px;
     }
 
-    /* // watermark */
+    /* watermark */
     @keyframes highlightMove {
-      0% { background-position:250% 0; }
-      100% { background-position:-250% 0; }
+      0% { background-position: 250% 0; }
+      100% { background-position: -250% 0; }
     }
 
     #watermarkMenu, #watermarkResult {
-      position:fixed; left:50%; transform:translateX(-50%);
-      font-family:'BebasNeue'; font-size:14px;
-      letter-spacing:1.5px; z-index:5;
-      background:linear-gradient(
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'BebasNeue';
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      z-index: 5;
+      background: linear-gradient(
         120deg,
         transparent 0%, transparent 30%,
-        rgba(255,255,255,.9) 50%,
+        rgba(255, 255, 255, .9) 50%,
         transparent 70%, transparent 100%
       );
-      background-size:250% 100%;
-      -webkit-background-clip:text; color:transparent;
-      animation:highlightMove 5s linear infinite;
+      background-size: 250% 100%;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: highlightMove 5s linear infinite;
     }
 
-    #watermarkMenu { bottom:250px; }
-    #watermarkResult { bottom:50px; }
+    #watermarkMenu {
+      bottom: 250px;
+    }
 
-    .hidden { display:none !important; }
+    #watermarkResult {
+      bottom: 50px;
+    }
 
-    /* // music */
+    .hidden {
+      display: none !important;
+    }
+
+    /* music */
     #musicToggle {
-      position:fixed; bottom:20px; right:20px;
-      font-size:11px; font-weight:bold;
-      color:#fff; opacity:.6;
-      cursor:pointer; transition:.2s;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      opacity: .6;
+      cursor: pointer;
+      transition: .2s;
     }
-    #musicToggle:hover { opacity:1; }
 
-    /* // tutorial */
-    #tutorialBtn {
-      position:fixed; bottom:55px; right:20px;
-      font-size:11px; font-weight:bold;
-      color:#fff; opacity:.6;
-      cursor:pointer; transition:.2s;
+    #musicToggle:hover {
+      opacity: 1;
     }
-    #tutorialBtn:hover { opacity:1; }
+
+    /* tutorial */
+    #tutorialBtn {
+      position: fixed;
+      bottom: 55px;
+      right: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      opacity: .6;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #tutorialBtn:hover {
+      opacity: 1;
+    }
 
     #tutorialOverlay {
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.85);
-      display:none; justify-content:center; align-items:center;
-      z-index:9999; opacity:0; transition:.4s;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: .4s;
     }
 
-    #tutorialOverlay.show { display:flex; opacity:1; }
+    #tutorialOverlay.show {
+      display: flex;
+      opacity: 1;
+    }
 
     #tutorialBox {
-      background:rgba(0,0,0,.6);
-      padding:15px; border-radius:14px;
-      width:70%; max-width:420px; text-align:center;
+      background: rgba(0, 0, 0, .6);
+      padding: 15px;
+      border-radius: 14px;
+      width: 70%;
+      max-width: 420px;
+      text-align: center;
     }
 
-    video { width:100%; border-radius:10px; }
+    video {
+      width: 100%;
+      border-radius: 10px;
+    }
 
     #controlsRow {
-      margin-top:12px;
-      display:flex; gap:8px; justify-content:space-between;
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
     }
 
-    #pauseVid, #closeTutorial {
-      width:48%; padding:10px;
-      background:#2563eb; border:none;
-      border-radius:8px; color:#fff;
-      font-weight:700; cursor:pointer;
+    #pauseVid,
+    #closeTutorial {
+      width: 48%;
+      padding: 10px;
+      background: #2563eb;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
     }
-    
+
     /* overlay loading video */
-#loadingOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(3px);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-  transition: 0.3s;
-}
-
-/* animasi loading */
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+    #loadingOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: 0.3s;
     }
-    
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .error-msg {
       color: #ff4d4d;
       font-weight: 600;
@@ -203,10 +296,8 @@
 
 <body>
 
-  <!-- // audio -->
   <div id="bgImage"></div>
 
-  <!-- // menu -->
   <div class="container">
     <div id="mainMenu" class="menu-wrapper">
       <h1>Followers Checker</h1>
@@ -214,7 +305,7 @@
 
       <input id="zipInput" type="file" accept=".zip" />
 
-      <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px;">
         <button onclick="startCheck()">Mulai</button>
         <button style="background:#444" onclick="clearInput()">Clear</button>
       </div>
@@ -226,23 +317,25 @@
     <button id="backBtn" onclick="backToMenu()">Kembali</button>
   </div>
 
-  <!-- // watermark -->
   <div id="watermarkMenu">- twentyseven -</div>
   <div id="watermarkResult" class="hidden">- twentyseven -</div>
 
-  <!-- // music toggle -->
   <div id="musicToggle">PLAY MUSIC</div>
   <audio id="bgMusic" src="music.mp3" loop></audio>
 
-  <!-- // tutorial -->
   <div id="tutorialBtn">TUTORIAL</div>
 
   <div id="tutorialOverlay">
-  	<div id="loadingOverlay">
-  <div class="loader"></div>
-</div>
+    <div id="loadingOverlay">
+      <div class="loader"></div>
+    </div>
+
     <div id="tutorialBox">
-      <video id="tutorialVideo" src="https://github.com/sapuutra27/Followers-Checker/releases/download/Tutorial/Tutorial.mp4"></video>
+      <video
+        id="tutorialVideo"
+        src="https://github.com/sapuutra27/Followers-Checker/releases/download/Tutorial/Tutorial.mp4">
+      </video>
+
       <div id="controlsRow">
         <button id="pauseVid">❚❚</button>
         <button id="closeTutorial">Kembali</button>
@@ -250,213 +343,194 @@
     </div>
   </div>
 
-<script>
-  // music
-const music = document.getElementById('bgMusic');
-const toggle = document.getElementById('musicToggle');
-let playing = false;
-let autoPaused = false;
+  <script>
+    const music = document.getElementById('bgMusic');
+    const toggle = document.getElementById('musicToggle');
 
-// unlock audio
-music.volume = 1;
+    let playing = false;
+    let autoPaused = false;
 
-toggle.onclick = () => {
-  // unlock audio context
-  music.play().catch(()=>{});
+    music.volume = 1;
 
-  if (!playing) {
-    music.play();
-    toggle.innerText = 'PAUSE MUSIC';
-  } else {
-    music.pause();
-    toggle.innerText = 'PLAY MUSIC';
-  }
-  playing = !playing;
-};
+    toggle.onclick = () => {
+      music.play().catch(() => {});
 
-  // tutorial
-const tutorialBtn = document.getElementById('tutorialBtn');
-const overlay = document.getElementById('tutorialOverlay');
-const video = document.getElementById('tutorialVideo');
-// auto repeat video
-video.addEventListener('ended', () => {
-  video.currentTime = 0;
-  video.play();
-});
-const pauseBtn = document.getElementById('pauseVid');
-const closeBtn = document.getElementById('closeTutorial');
+      if (!playing) {
+        music.play();
+        toggle.innerText = 'PAUSE MUSIC';
+      } else {
+        music.pause();
+        toggle.innerText = 'PLAY MUSIC';
+      }
 
-// buka tutorial
-tutorialBtn.onclick = () => {
+      playing = !playing;
+    };
 
-  // // auto mute music
-  if (playing) {
-    music.pause();
-    autoPaused = true;      // catat bahwa pause berasal dari tutorial
-    toggle.innerText = 'PLAY MUSIC';
-    playing = false;
-  }
+    const tutorialBtn = document.getElementById('tutorialBtn');
+    const overlay = document.getElementById('tutorialOverlay');
+    const video = document.getElementById('tutorialVideo');
+    const pauseBtn = document.getElementById('pauseVid');
+    const closeBtn = document.getElementById('closeTutorial');
 
-  overlay.classList.add('show');
-  video.currentTime = 0;
-  video.play();
-};
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play();
+    });
 
-// pause/play video
-pauseBtn.onclick = () => {
-  if (video.paused) {
-    video.play();
-    pauseBtn.innerText = '❚❚';
-  } else {
-    video.pause();
-    pauseBtn.innerText = '▶';
-  }
-};
+    tutorialBtn.onclick = () => {
+      if (playing) {
+        music.pause();
+        autoPaused = true;
+        toggle.innerText = 'PLAY MUSIC';
+        playing = false;
+      }
 
-const loadingOverlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('show');
+      video.currentTime = 0;
+      video.play();
+    };
 
-// ketika video buffering karena jaringan lemot
-video.addEventListener('waiting', () => {
-  loadingOverlay.style.display = 'flex';
-  console.log('Buffering...');
-});
+    pauseBtn.onclick = () => {
+      if (video.paused) {
+        video.play();
+        pauseBtn.innerText = '❚❚';
+      } else {
+        video.pause();
+        pauseBtn.innerText = '▶';
+      }
+    };
 
-// jaringan putus / video tidak bisa load
-video.addEventListener('stalled', () => {
-  loadingOverlay.style.display = 'flex';
-  console.log('Stalled – kemungkinan internet lemot.');
-});
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
-// ketika video mulai berjalan lagi
-video.addEventListener('playing', () => {
-  loadingOverlay.style.display = 'none';
-  console.log('Playing – buffer selesai.');
-});
+    video.addEventListener('waiting', () => {
+      loadingOverlay.style.display = 'flex';
+    });
 
-// kalau video error
-video.addEventListener('error', () => {
-  loadingOverlay.style.display = 'flex';
-  console.log('Error – video gagal dimuat.');
-});
+    video.addEventListener('stalled', () => {
+      loadingOverlay.style.display = 'flex';
+    });
 
-// tutup tutorial
-closeBtn.onclick = () => {
-  video.pause();
-  overlay.classList.remove('show');
+    video.addEventListener('playing', () => {
+      loadingOverlay.style.display = 'none';
+    });
 
-  // // auto unmute jika tadi dipause otomatis
-  if (autoPaused) {
-    music.play();
-    toggle.innerText = 'PAUSE MUSIC';
-    playing = true;
-    autoPaused = false;
-  }
-};
+    video.addEventListener('error', () => {
+      loadingOverlay.style.display = 'flex';
+    });
 
-  // clear
-  function clearInput() {
-    const zip = document.getElementById('zipInput');
+    closeBtn.onclick = () => {
+      video.pause();
+      overlay.classList.remove('show');
 
-    zip.value = '';
-    document.getElementById('warnMsg').style.display = 'none';
-    document.getElementById('resultBox').style.display = 'none';
-    document.getElementById('resultBox').innerHTML = '';
-    document.getElementById('backBtn').style.display = 'none';
+      if (autoPaused) {
+        music.play();
+        toggle.innerText = 'PAUSE MUSIC';
+        playing = true;
+        autoPaused = false;
+      }
+    };
 
-    document.getElementById('mainMenu').style.display = 'block';
-    document.getElementById('watermarkMenu').classList.remove('hidden');
-    document.getElementById('watermarkResult').classList.add('hidden');
-  }
+    function clearInput() {
+      const zip = document.getElementById('zipInput');
 
-  // cari file
-  function findFile(zip, filename) {
-    const re = new RegExp('(?:^|/)' + filename.replace(/\./g, '\\.') + '$', 'i');
-    return Object.values(zip.files).find(f => re.test(f.name)) || null;
-  }
+      zip.value = '';
+      document.getElementById('warnMsg').style.display = 'none';
+      document.getElementById('resultBox').style.display = 'none';
+      document.getElementById('resultBox').innerHTML = '';
+      document.getElementById('backBtn').style.display = 'none';
 
-  function findFollowersFiles(zip) {
-    const re = /(?:^|\/)followers(?:_\d+)?\.json$/i;
-    return Object.values(zip.files).filter(f => re.test(f.name));
-  }
-
-  // proses utama
-  async function startCheck() {
-    const file = document.getElementById('zipInput').files[0];
-    const menu = document.getElementById('mainMenu');
-    const result = document.getElementById('resultBox');
-    const backBtn = document.getElementById('backBtn');
-
-    result.style.display = 'block';
-    result.classList.add('show');
-    backBtn.style.display = 'inline-block';
-    menu.style.display = 'none';
-
-    document.getElementById('watermarkMenu').classList.add('hidden');
-    document.getElementById('watermarkResult').classList.remove('hidden');
-
-    if (!file) {
-      result.innerHTML = 'Silakan upload file ZIP terlebih dahulu.';
-      return;
+      document.getElementById('mainMenu').style.display = 'block';
+      document.getElementById('watermarkMenu').classList.remove('hidden');
+      document.getElementById('watermarkResult').classList.add('hidden');
     }
 
-    result.innerHTML = 'Memproses...';
+    function findFile(zip, filename) {
+      const re = new RegExp('(?:^|/)' + filename.replace(/\./g, '\\.') + '$', 'i');
+      return Object.values(zip.files).find(f => re.test(f.name)) || null;
+    }
 
-    try {
-      const zip = await JSZip.loadAsync(file);
+    function findFollowersFiles(zip) {
+      const re = /(?:^|\/)followers(?:_\d+)?\.json$/i;
+      return Object.values(zip.files).filter(f => re.test(f.name));
+    }
 
-      const followingFile = findFile(zip, 'following.json');
-      const followersFiles = findFollowersFiles(zip);
+    async function startCheck() {
+      const file = document.getElementById('zipInput').files[0];
+      const menu = document.getElementById('mainMenu');
+      const result = document.getElementById('resultBox');
+      const backBtn = document.getElementById('backBtn');
 
-      if (!followingFile || followersFiles.length === 0) {
-        result.innerHTML =
-          "File ZIP tidak valid.<br>Pastikan memuat <b>following.json</b> & <b>followers_*.json</b>.";
+      result.style.display = 'block';
+      result.classList.add('show');
+      backBtn.style.display = 'inline-block';
+      menu.style.display = 'none';
+
+      document.getElementById('watermarkMenu').classList.add('hidden');
+      document.getElementById('watermarkResult').classList.remove('hidden');
+
+      if (!file) {
+        result.innerHTML = 'Silakan upload file ZIP terlebih dahulu.';
         return;
       }
 
-      // followers
-      const followersSet = new Set();
+      result.innerHTML = 'Memproses...';
 
-      for (const f of followersFiles) {
-        let json;
-        try { json = JSON.parse(await f.async('string')); } catch { continue; }
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const followingFile = findFile(zip, 'following.json');
+        const followersFiles = findFollowersFiles(zip);
 
-        if (Array.isArray(json)) {
-          json.forEach(entry => {
-            const val = entry?.string_list_data?.[0]?.value || entry?.username;
-            if (val) followersSet.add(val);
-          });
+        if (!followingFile || followersFiles.length === 0) {
+          result.innerHTML =
+            "File ZIP tidak valid.<br>Pastikan memuat <b>following.json</b> & <b>followers_*.json</b>.";
+          return;
         }
+
+        const followersSet = new Set();
+
+        for (const f of followersFiles) {
+          let json;
+          try {
+            json = JSON.parse(await f.async('string'));
+          } catch {
+            continue;
+          }
+
+          if (Array.isArray(json)) {
+            json.forEach(entry => {
+              const val = entry?.string_list_data?.[0]?.value || entry?.username;
+              if (val) followersSet.add(val);
+            });
+          }
+        }
+
+        const followingJson = JSON.parse(await followingFile.async('string'));
+        const followingList = (followingJson.relationships_following || [])
+          .map(e => e.title || e.username)
+          .filter(Boolean);
+
+        const notFollowBack = followingList.filter(u => !followersSet.has(u));
+
+        result.innerHTML =
+          `<b>Total tidak follow balik: ${notFollowBack.length}</b><br><br>` +
+          (notFollowBack.length ? notFollowBack.join('<br>') : 'Semua follow balik.');
+
+      } catch (err) {
+        result.innerHTML =
+          '<div class="error-msg">Arsip rusak atau file ZIP tidak dapat dibaca, penyebabnya mungkin saat download internet jelek jadi filenya jadi rusak, coba download ulang pakai WiFi atau cek koneksi internetmu. aku juga belum nemuin masalah terkait ini, karena ada yang filenya aman ada juga yang rusak.. meskipun sudah ngikutin langkah2nya dengan benar, nanti akan aku carikan solusinya.</div>';
       }
+    }
 
-      // following
-      const followingJson = JSON.parse(await followingFile.async('string'));
-      const followingList = (followingJson.relationships_following || [])
-        .map(e => e.title || e.username)
-        .filter(Boolean);
+    function backToMenu() {
+      document.getElementById('resultBox').style.display = 'none';
+      document.getElementById('resultBox').innerHTML = '';
+      document.getElementById('backBtn').style.display = 'none';
+      document.getElementById('mainMenu').style.display = 'block';
 
-      // compare
-      const notFollowBack = followingList.filter(u => !followersSet.has(u));
-
-      result.innerHTML =
-        `<b>Total tidak follow balik: ${notFollowBack.length}</b><br><br>` +
-        (notFollowBack.length ? notFollowBack.join('<br>') : 'Semua follow balik.');
-
-    } catch (err) {
-  result.innerHTML = '<div class="error-msg">Arsip rusak atau file ZIP tidak dapat dibaca.</div>';
-      }
-     }
-
-  // kembali
-  function backToMenu() {
-    document.getElementById('resultBox').style.display = 'none';
-    document.getElementById('resultBox').innerHTML = '';
-    document.getElementById('backBtn').style.display = 'none';
-    document.getElementById('mainMenu').style.display = 'block';
-
-    document.getElementById('watermarkMenu').classList.remove('hidden');
-    document.getElementById('watermarkResult').classList.add('hidden');
-  }
-</script>
+      document.getElementById('watermarkMenu').classList.remove('hidden');
+      document.getElementById('watermarkResult').classList.add('hidden');
+    }
+  </script>
 
 </body>
 </html>
